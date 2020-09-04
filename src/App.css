@@ -1,0 +1,106 @@
+.App {
+  text-align: center;
+  
+  
+  /* background-image: url("https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/texture_00070.jpg?alt=media&token=84da94be-d850-4338-bb2b-db33c0b21618");
+  background-color: rgba(0,0,0,0.5); */
+  /* background-size: cover; */
+
+}
+
+.App:focus {
+  outline: none;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.playbutton {
+  width: 152px;
+  height: 90px;
+  /*padding: 10px 30px;*/
+  font-size: 22px;
+  margin: 10px 40px 10px 40px;
+  /* background-color: #61dafb; */
+  background-color: rgba(81, 241, 66, 0.6);
+  box-shadow: 0 4px plum;
+  border-radius: 4px;
+}
+
+@media(max-width: 670px){
+  .playbutton{
+    width: 126px;
+    height: 100px;
+    /*padding: 10px 30px;*/
+    font-size: 16px;
+    margin: 20px 20px 20px 20px;
+    /* background-color: #61dafb; */
+    background-color: rgba(81, 241, 66, 0.6);
+    box-shadow: 0 4px plum;
+    border-radius: 4px;
+  }
+}
+
+
+.playbutton:hover{
+  background-color: rgba(81, 241, 66, 0.9);
+  cursor: pointer;
+}
+
+.playbutton:active{
+  background-color: rgba(81, 241, 66, 1);
+  box-shadow: none;
+  position: relative;
+  top: 4px;
+}
+
+.sendbutton{
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.high-light{
+  font-weight: bold;
+  color: blue;
+}
+
+.log-btn{
+  background-color: #85692d;
+  
+}
+
+.bottom-margin{
+  height: 50px;
+}

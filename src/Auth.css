@@ -1,0 +1,39 @@
+.UserName{
+    display: inline;
+    margin: 0 50px 0 0;
+    color: #001aff;
+}
+
+.UserNameTitle{
+    color: rgb(0, 0, 0);
+    font-weight: normal;
+}
+
+.UserName-log{
+    display: inline;
+}
+
+.photo-url{
+    width: 22px;
+    height: 22px;
+}
+
+.login-btn{
+    background-color: rgb(100, 161, 241);
+}
+
+.logout-btn{
+    background-color: rgba(241, 42, 118, 0.9);
+}
+
+@media(min-width: 670px){
+    .login-logout{
+        height: 50px;
+        width: 120px;
+        font-size: 15px;
+    }
+}
+
+.login-logout:hover{
+    opacity: 0.7;
+}
