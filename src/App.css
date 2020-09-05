@@ -104,3 +104,10 @@
 .bottom-margin{
   height: 50px;
 }
+
+.enter-btn{
+  width: 30%;
+  height: 90px;
+  margin: 20px;
+  font-size: 22px;
+}

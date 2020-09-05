@@ -24,7 +24,7 @@ class Auth extends Component {
     firebase.auth().onAuthStateChanged(user => {
       this.setState({ user });
       console.log(user);
-      
+      console.log(user.photoURL);
       return;
       if(user == null){
           console.log("user is null");

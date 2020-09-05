@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import * as firebase from 'firebase';
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
 import RangeSlider from 'react-bootstrap-range-slider';
 import Auth from './Auth.js';
 import CSV from './CSV.js';
-import Signin from './Signin';
-import Exp from './router.js';
+//import Signin from './Signin';
+//import Exp from './router.js';
 //import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css'
 
 // const firebaseConfig = {
@@ -24,7 +24,7 @@ import Exp from './router.js';
 var updcnt = 0;
 //var firstAudio1 = true;
 var totalSound = 6;
-var firstAudio = totalSound;
+//var firstAudio = totalSound;
 var soundVolumeManager = 0.05;
 const soundAssist = [0.1,0.1,0,0,0.1,0.15];
 var notSendState = ['ON', 'OFF'];
@@ -32,11 +32,33 @@ var keyList = [113,119,97,115,122,120];
 var audioComponentSize = 2;
 var audioComponentList = [0,0,0,0,0,0];
 const room_col = "rooms";
-//const log_data = "log";
 const sound_list = "sound_list";
 const push_log_ = "push_log";
-let room_name = "jikken1";
+var room_name = window.location.pathname;
+let firstVisit = true;
 
+if(firstVisit){
+  if(window.location.pathname === "/"){
+    firstVisit = false;
+  }else{
+    const col = firebase.firestore().collection(room_col).doc(room_name).collection(sound_list);
+    for(let i=0;i<totalSound;i++){
+      col.doc("sound"+i).get().then((doc) => {
+        if(doc.exists){
+          console.log(doc.data());
+        }else{
+          col.doc("sound"+i).set({
+            sound: i,
+            randomNum: 2.2
+          });
+        }
+      }).catch((error)=>{
+        console.log(error);
+      });
+    }
+    firstVisit = false;
+  }
+}
 
 var audioSourceList = [
   "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/line-girl1-hee1.mp3?alt=media&token=6a2c0c19-59ba-4203-a13d-1bb9a87fae3c",
@@ -76,6 +98,7 @@ for(let i=0;i<totalSound;i++){
 }
 
 
+
 function App() {
   const [soundVolume, setsoundVolume] = useState(0.05);
   const [notSend,setnotSend] = useState(0);
@@ -83,25 +106,32 @@ function App() {
 
   useEffect(()=>{
     console.log('useEffect');
-
+    if(window.location.pathname === "/") return;
     const db = firebase.firestore();
-        const unsubscribe = db.collection(room_col).doc(room_name).collection(sound_list).onSnapshot(function(querySnapshot) {
+      const unsubscribe = db.collection(room_col).doc(room_name).collection(sound_list).onSnapshot(function(querySnapshot) {
         querySnapshot.docChanges().forEach(function(change) {
             // if (change.type === "added") console.log("New city: ", change.doc.data());
             // if (change.type === "modified") console.log("Modified city: ", change.doc.data());
             // if (change.type === "removed") console.log("Removed city: ", change.doc.data());
-            if(firstAudio > 0){
-              //console.log(firstAudio);
-              firstAudio--;
+            console.log(change.type);
+            if (change.type === "added" || change.type === "removed"){
               return;
             }
-            for(let i=0;i<totalSound;i++){
-              if(change.doc.data().sound === i){
-                Audioplay('sound-'+i+'-'+audioComponentList[i], i);
-                audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
-                //console.log('if case success', i);
-              }
-            }
+            // if(firstAudio > 0){
+            //   //console.log(firstAudio);
+            //   firstAudio--;
+            //   return;
+            // }
+            const i = change.doc.data().sound;
+            Audioplay('sound-'+i+'-'+audioComponentList[i], i);
+            audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
+            // for(let i=0;i<totalSound;i++){
+            //   if(change.doc.data().sound === i){
+            //     Audioplay('sound-'+i+'-'+audioComponentList[i], i);
+            //     audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
+            //     //console.log('if case success', i);
+            //   }
+            // }
         });
     });
     return () => {
@@ -207,34 +237,41 @@ function App() {
     link.click();
   }
 
-
-  const handleClickFetchInfo = () => {
-    var user = firebase.auth().currentUser;
-    var name, email, photoUrl, uid, emailVerified;
-
-    if (user != null) {
-      name = user.displayName;
-      email = user.email;
-      photoUrl = user.photoURL;
-      emailVerified = user.emailVerified;
-      uid = user.uid; 
-      console.log(name);
-      console.log(email);
-      console.log(photoUrl);
-      console.log(emailVerified);
-      console.log(uid);
-      // The user's ID, unique to the Firebase project. Do NOT use
-      // this value to authenticate with your backend server, if
-      // you have one. Use User.getToken() instead.
-    }
+  const Geturl = () => {
+    const url = window.location.pathname;
+    console.log(url);
   }
 
-  return (
+  const createRoom = () => {
+    const url = window.location.href + "default";
+    //room_name = "default";
+    //window.location.href = url;
+    window.open(url, '_brank');
+  }
+
+  const createRoomName = () => {
+    let roomName = document.getElementById("roomName").value;
+    console.log("roomName is:" + roomName);
+    const re = / +/;
+    console.log(re.test(roomName));
+    roomName = roomName.replace(/\s+/g, "");
+    console.log("replace roomName is:" + roomName);
+    if(re.test(roomName) || roomName === "") return;
+    const url = window.location.href + roomName;
+    console.log(roomName);
+    console.log(url);
+    window.open(url, '_brank');
+  }
+
+  let appfunction;
+  if(window.location.pathname !== "/"){
+
+    appfunction = (
     <div tabIndex='0' className="App" onKeyPress={(e)=> KeyPress(e)}>
       
       <Auth/>
 
-      <Exp/>
+      
 
       <h3>volume
         <RangeSlider className='volume-slider' max={0.3} min={0} step={0.01} value={soundVolume} onChange={(e)  => {setsoundVolume(Number(e.target.value)); soundVolumeManager = Number(e.target.value);}}/>
@@ -269,9 +306,28 @@ function App() {
       
       
       {/* <button className="log-btn" onClick={()=>{handleClickLogButton()}}>ログ保存</button> */}
-      <img src="https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/qrcode.png?alt=media&token=261ab25d-11ee-492b-92e0-39f12b10b5c8"></img>
+      
+      <img src={"http://chart.apis.google.com/chart?cht=qr&chs=260x260&chl="+window.location.href}></img>
       <div className="bottom-margin"></div>
     </div>
+    )
+  }else{
+    appfunction = (
+      <div className="App">
+        <h3>reaction tool</h3>
+        <button className="enter-btn" onClick={()=>{createRoom()}}>ランダムで作成する</button>
+        <br></br>
+        <button className="enter-btn" onClick={()=>{createRoomName()}}>名前をつけて作成する</button>
+        <br></br>
+        <span>名前 </span>
+        <input id="roomName"></input>
+        {/* <button onClick={()=>{Geturl()}}>GetUrl</button> */}
+      </div>
+    );
+  }
+
+  return (
+    <div>{appfunction}</div>
   );
 }
 
