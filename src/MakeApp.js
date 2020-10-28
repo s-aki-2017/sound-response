@@ -41,7 +41,7 @@ let firstVisit = true;
 
 if(firstVisit){
   if(window.location.pathname === "/"){
-    window.location.href = window.location.href + "default";
+    //window.location.href = window.location.href + "sig0914";
     firstVisit = false;
   }else{
     const col = firebase.firestore().collection(room_col).doc(room_name).collection(sound_list);
@@ -63,40 +63,9 @@ if(firstVisit){
   }
 }
 
-const soundEffectList = [
-  [
-    {name: "なるほど", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B31.wav?alt=media&token=06eca388-8c58-4c3b-b015-2155ed189783"},
-    {name: "いいね", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B31.wav?alt=media&token=f4b80399-af83-44b8-9ddb-192c73dd4c0e"}
-  ],
-  [
-    {name: "なるほど", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B32.wav?alt=media&token=cea25561-e246-4f22-b2f8-5b0544adaefe"},
-    {name: "いいね", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B32.wav?alt=media&token=67412df4-c8fd-4f2a-97b7-0fee7266a531"}
-  ],
-  [
-    {name: "なるほど", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B33.wav?alt=media&token=93aa1f29-6985-4ba1-8c44-11ed8e8afd81"},
-    {name: "いいね", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B33.wav?alt=media&token=f72cdf0c-4be8-49f2-b111-743c4aa83152"}
-  ],
-  [
-    {name: "なるほど", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B71.wav?alt=media&token=76d319ad-ff65-4d7c-8cc7-4c327a5b2e7f"},
-    {name: "いいね", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B71.wav?alt=media&token=de21b022-69da-4ed6-b331-8418a0b2f53d"}
-  ],
-  [
-    {name: "なるほど", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B72.wav?alt=media&token=d465a48b-c920-4415-9b30-67a3f4e01ebd"},
-    {name: "いいね", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B72.wav?alt=media&token=0f5c26d8-4b98-42dc-8657-bd98b582f381"}
-  ],
-  [
-    {name: "なるほど", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B73.wav?alt=media&token=b0646041-2b10-4e53-8af6-622592258719"},
-    {name: "いいね", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B73.wav?alt=media&token=a621a696-391a-42dc-89d5-7916d24ed673"}
-  ]
-];
-
-const reverseRef = {
-  "lady1": 0,
-  "lady2": 1,
-  "lady3": 2,
-  "man1": 3,
-  "man2": 4,
-  "man3": 5
+const soundEffect1 = {
+  "なるほど": {name: "なるほど", voice: "man1", url:""},
+  
 };
 
 
@@ -141,8 +110,7 @@ for(let i=0;i<totalSound;i++){
 
 function App() {
   const [soundVolume, setsoundVolume] = useState(0.05);
-  const [notSend, setnotSend] = useState(0);
-  const [manVoice, setmanVoice] = useState("lady1");
+  const [notSend,setnotSend] = useState(0);
   console.log('inited');
 
   useEffect(()=>{
@@ -163,11 +131,9 @@ function App() {
             //   firstAudio--;
             //   return;
             // }
-            const voiceMan = change.doc.data().sound;
-            //Audioplay(voiceMan, i);
-            if(Number.isInteger(voiceMan)) Audioplay('sound-'+voiceMan+'-'+audioComponentList[voiceMan], voiceMan);
-            else Audioplay(voiceMan+'-'+0, 0);
-            //audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
+            const i = change.doc.data().sound;
+            Audioplay('sound-'+i+'-'+audioComponentList[i], i);
+            audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
             // for(let i=0;i<totalSound;i++){
             //   if(change.doc.data().sound === i){
             //     Audioplay('sound-'+i+'-'+audioComponentList[i], i);
@@ -200,9 +166,8 @@ function App() {
     }
     console.log('soundVolume is ',soundVolumeManager);
     console.log('sound idName is', idName);
-    //const tmp = soundVolumeManager + soundAssist[sound];
-    //document.getElementById(idName).volume = tmp;
-    document.getElementById(idName).volume = soundVolumeManager;
+    const tmp = soundVolumeManager + soundAssist[sound];
+    document.getElementById(idName).volume = tmp;
     //console.log(tmp);
     document.getElementById(idName).play();
   }
@@ -324,70 +289,6 @@ function App() {
     window.open(url, '_brank');
   }
 
-  const voiceChange = ()=>{
-    //
-    const voicelist = document.selectlist.voiceselect;
-    const num = voicelist.selectedIndex;
-    const voiceData = voicelist.options[num].value;
-    console.log(voiceData);
-    setmanVoice(voiceData);
-  };
-
-  const handleClickPlay = async (sound)=>{
-    const db = firebase.firestore();
-    const voiceManId = reverseRef[manVoice];
-    const voiceMan = soundEffectList[voiceManId][sound].name + manVoice;
-    //Audioplay(voiceMan+'-'+0, sound);
-    if(notSend){
-      Audioplay(voiceMan + '-' + audioComponentList[sound], sound);
-      //audioComponentList[sound] = (audioComponentList[sound] + 1) % audioComponentSize;
-      const push_log = db.collection(room_col).doc(room_name).collection("push_log");
-      const date = new Date();
-      const time = date.toLocaleString();
-      const user = firebase.auth().currentUser;
-      let uid = "guest";
-      let displayName = "guest";
-      if(user != null){
-        uid = user.uid;
-        displayName = user.displayName;
-      }
-      const data = {rowtime: date, time: time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
-      push_log.doc().set(data);
-      console.log(data);
-      return;
-    }
-    const docId = voiceMan;
-    const randomNum= Math.random();
-    const newData = {sound: voiceMan, randomNum: randomNum+updcnt};
-    try{
-      //console.log(newData);
-      await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).update(newData);
-    }catch(error){
-      await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).set(newData);
-      console.error(error);
-    }
-    updcnt = (updcnt + 1.0);
-
-    //データベースに押したことを保存
-    const user = firebase.auth().currentUser;
-    let uid = "guest";
-    let displayName = "guest";
-    if(user != null){
-      uid = user.uid;
-      displayName = user.displayName;
-    }
-    //なければデータベースに追加
-    //const push_log = db.collection("rooms").doc(room).collection("people").doc("person1").collection("push_log");
-    const push_log = db.collection(room_col).doc(room_name).collection(push_log_);
-    const date = new Date();
-    const time = date.toLocaleString();
-    
-    const data = {rowtime: date, time: time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
-    push_log.doc().set(data);
-    console.log(data);
-  }
-  
-
   let appfunction;
   if(window.location.pathname !== "/"){
 
@@ -404,19 +305,15 @@ function App() {
       <button className='sendbutton' onClick={()=>{setnotSend(1-notSend);}}><span className="high-light">{notSendState[notSend]}</span> ← (ON:音が共有される  OFF:音は共有されない)</button>
       
       <br></br>
-      <form name="selectlist">
-        <select name="voiceselect" onChange={()=>{voiceChange()}}>
-          <option value="lady1">女1</option>
-          <option value="lady2">女2</option>
-          <option value="lady3">女3</option>
-          <option value="man1">男1</option>
-          <option value="man2">男2</option>
-          <option value="man3">男3</option>
-        </select>
-      </form>
-      <br></br>
-      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
-      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(1)}}>いいね</button>
+      <select name="voice">
+        <option value="選択肢2">男1</option>
+        <option value="選択肢3">男2</option>
+        <option value="選択肢4">男3</option>
+        <option value="選択肢5">女1</option>
+        <option value="選択肢6">女2</option>
+        <option value="選択肢7">女3</option>
+      </select>
+
       <br></br>
       <button className='playbutton sound0' onClick={() => {handleClickPush(0)}}>{audioNameList[0]}</button>
       
@@ -439,83 +336,6 @@ function App() {
           </audio>
         );
       })}
-
-      {/* {soundEffectLady.map((array) =>{
-        //console.log(array);
-        array.map((data) => {
-          console.log(data.name+data.voice);
-          return(
-            <audio key={data.name+data.voice} id={data.name+data.voice} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        });
-      })} */}
-      
-      {soundEffectList[0].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[1].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[2].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[3].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[4].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[5].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      
-      {/* <audio key={soundEffectLady1[0].name+soundEffectLady1[0].voice} id={soundEffectLady1[0].name+soundEffectLady1[0].voice} preload="auto">
-        <source src={soundEffectLady1[0].url}></source>
-      </audio>
-      <audio key={soundEffectLady2[0].name+soundEffectLady2[0].voice} id={soundEffectLady2[0].name+soundEffectLady2[0].voice} preload="auto">
-        <source src={soundEffectLady2[0].url}></source>
-      </audio>
-      <audio key={soundEffectLady3[0].name+soundEffectLady3[0].voice} id={soundEffectLady3[0].name+soundEffectLady3[0].voice} preload="auto">
-        <source src={soundEffectLady3[0].url}></source>
-      </audio> */}
       <p>↓スマホで読み取るとこの画面のリンクが表示</p>
       <Qrcode/>
       {/* <input id="move-form"></input>

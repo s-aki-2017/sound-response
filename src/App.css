@@ -48,8 +48,8 @@
 }
 
 .playbutton {
-  width: 152px;
-  height: 90px;
+  width: 149px;
+  height: 87px;
   /*padding: 10px 30px;*/
   font-size: 22px;
   margin: 10px 40px 10px 40px;
@@ -59,7 +59,11 @@
   border-radius: 4px;
 }
 
-@media(max-width: 670px){
+.colorbutton{
+  background-color: rgba(0,255,255,0.6);
+}
+
+@media(max-width: 570px){
   .playbutton{
     width: 126px;
     height: 100px;
@@ -75,7 +79,7 @@
 
 
 .playbutton:hover{
-  background-color: rgba(81, 241, 66, 0.9);
+  background-color: rgba(81, 241, 66, 1);
   cursor: pointer;
 }
 
@@ -84,6 +88,13 @@
   box-shadow: none;
   position: relative;
   top: 4px;
+}
+
+.colorbutton:hover{
+  background-color: rgba(0,255,255,1);
+}
+.colorbutton:active{
+  background-color: rgba(0,255,255,1);
 }
 
 .sendbutton{
@@ -110,4 +121,25 @@
   height: 90px;
   margin: 20px;
   font-size: 22px;
+}
+
+.random-btn{
+  background-color: rgb(43, 241, 69);
+  border-radius: 4px;
+  box-shadow: 0 4px plum;
+  
+}
+.random-btn:hover{
+  background-color: rgba(61, 248, 86, 0.8);
+  cursor: pointer;
+}
+.random-btn:active{
+  background-color: rgba(61, 248, 86, 0.9);
+  box-shadow: none;
+  position: relative;
+  top: 4px;
+}
+
+.create-btn{
+  background-color: black;
 }
