@@ -1,32 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import * as firebase from 'firebase';
-//import logo from './logo.svg';
 import './App.css';
 import RangeSlider from 'react-bootstrap-range-slider';
 import Auth from './Auth.js';
 import CSV from './CSV.js';
 import Qrcode from './qrcode';
-//import Signin from './Signin';
-//import Exp from './router.js';
-//import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css'
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCWblfVKhwIxF5rG6w0H-ZUiu8E5MLKHhk",
-//   authDomain: "test1-81afe.firebaseapp.com",
-//   databaseURL: "https://test1-81afe.firebaseio.com",
-//   projectId: "test1-81afe",
-//   storageBucket: "test1-81afe.appspot.com",
-//   messagingSenderId: "1005325532421",
-//   appId: "1:1005325532421:web:c93c507b5c92d79b2a0b6c",
-//   measurementId: "G-5NLVM6TC4W"
-// };
-// firebase.initializeApp(firebaseConfig);
+import './Swipe.css';
+import SelfNoSleep from './SelfNoSleep.js';
+//import NoSleep from 'nosleep.js';
+import nosleep from 'nosleep.js';
 
 var updcnt = 0;
-//var firstAudio1 = true;
 var totalSound = 6;
-//var firstAudio = totalSound;
-var soundVolumeManager = 0.05;
+var soundVolumeManager = 0.3;
 const soundAssist = [0,0,0,0,0,0];
 var notSendState = ['ON', 'OFF'];
 var keyList = [113,119,97,115,122,120];
@@ -37,11 +23,111 @@ const sound_list = "sound_list";
 const push_log_ = "push_log";
 var room_name = window.location.pathname;
 let firstVisit = true;
+let firstFlag = true;
+var firstSleep = true;
+var noSleep = new nosleep();
+
+
+
+const TransTime = ()=>{
+  //const request = new XMLHttpRequest();
+  //request.open('HEAD', window.location.href, true);
+  //request.send();
+  let serverDate;
+  let date = new Date();
+  let time = date.toLocaleString();
+  let mili = Date.parse(time);
+  // request.onreadystatechange = function() {
+  //   if (this.readyState === 4) {
+  //     serverDate = new Date(request.getResponseHeader('Date'));
+  //     time = serverDate.toLocaleString();
+  //     mili = Date.parse(time);
+  //     console.log(1);
+  //   }
+  // }
+  //console.log(3);
+  return {time: time, mili: mili};
+}
+
+
+var audioTagSize = 1;
+var audioTagList = [0,0,0,0,0,0];
+var audioTag = 0;
+
+const soundEffectList = [
+  [
+    {name: "なるほど", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B31.wav?alt=media&token=06eca388-8c58-4c3b-b015-2155ed189783"},
+    {name: "いいね", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B31.wav?alt=media&token=f4b80399-af83-44b8-9ddb-192c73dd4c0e"},
+    {name: "神", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E5%A5%B31.wav?alt=media&token=a5741d0b-815f-4be6-a93a-4993380d9760"},
+    {name: "たしかに", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E5%A5%B31.wav?alt=media&token=2d1ec44d-78ca-42f1-b1d1-ec53ee05bde1"},
+    {name: "すごい", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E5%A5%B31.wav?alt=media&token=41d1a813-5b0a-4aad-a3e7-e7ce458bf07b"},
+    {name: "まじで", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E5%A5%B31.wav?alt=media&token=271c6f98-2661-45aa-824c-bcdea55635bb"}
+  ],
+  [
+    {name: "なるほど", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B32.wav?alt=media&token=cea25561-e246-4f22-b2f8-5b0544adaefe"},
+    {name: "いいね", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B32.wav?alt=media&token=67412df4-c8fd-4f2a-97b7-0fee7266a531"},
+    {name: "神", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E5%A5%B32.wav?alt=media&token=083c59c5-2fd1-436b-9155-38102277a9a1"},
+    {name: "たしかに", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E5%A5%B32.wav?alt=media&token=c5d0ee82-bcfd-41f8-83d9-73c3a59783ca"},
+    {name: "すごい", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E5%A5%B32.wav?alt=media&token=0bb440b9-b231-4e0d-aea0-5763a1e7476a"},
+    {name: "まじで", voice: "lady2", url: "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E5%A5%B32.wav?alt=media&token=16f13a1a-535e-4066-b088-d1d1cc98e4bf"}
+  ],
+  [
+    {name: "なるほど", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B33.wav?alt=media&token=93aa1f29-6985-4ba1-8c44-11ed8e8afd81"},
+    {name: "いいね", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B33.wav?alt=media&token=f72cdf0c-4be8-49f2-b111-743c4aa83152"},
+    {name: "神", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E5%A5%B33.wav?alt=media&token=5be9a978-f173-4003-bbfe-56a44af79120"},
+    {name: "たしかに", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E5%A5%B33.wav?alt=media&token=ad331ccb-8d2b-4a23-8515-c186fabf68a2"},
+    {name: "すごい", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E5%A5%B33.wav?alt=media&token=c63949d7-3f28-4416-a25a-65458a49c8b6"},
+    {name: "まじで", voice: "lady3", url: "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E5%A5%B33.wav?alt=media&token=aebb361a-1882-4d49-89d5-582ef8a61311"}
+  ],
+  [
+    {name: "なるほど", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B71.wav?alt=media&token=76d319ad-ff65-4d7c-8cc7-4c327a5b2e7f"},
+    {name: "いいね", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B71.wav?alt=media&token=de21b022-69da-4ed6-b331-8418a0b2f53d"},
+    {name: "神", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E7%94%B71.wav?alt=media&token=0b9ba888-0fba-4468-8af4-ab196995052e"},
+    {name: "たしかに", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E7%94%B71.wav?alt=media&token=c53e9cc7-e5ce-4359-9129-be8888cf2aa8"},
+    {name: "すごい", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E7%94%B71.wav?alt=media&token=9eb38452-dec9-4908-a057-6e19b42c8d75"},
+    {name: "まじで", voice: "man1", url: "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E7%94%B71.wav?alt=media&token=a9e5e192-01bc-4626-8ead-a63058096f37"}
+  ],
+  [
+    {name: "なるほど", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B72.wav?alt=media&token=f45be20d-1fb4-4b57-af92-1764b691abb3"},
+    {name: "いいね", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B72.wav?alt=media&token=089e1439-7423-4109-bd92-cc8fd2ef2f89"},
+    {name: "神", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E7%94%B72.wav?alt=media&token=4167706b-f893-48a1-b21d-58fbcf3b8dd3"},
+    {name: "たしかに", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E7%94%B72.wav?alt=media&token=428239ec-cd9d-4340-be08-3dcfc4fd3b84"},
+    {name: "すごい", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E7%94%B72.wav?alt=media&token=915c93e2-b02b-4cf3-8ce3-f1a0069ff590"},
+    {name: "まじで", voice: "man2", url: "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E7%94%B72.wav?alt=media&token=8f2f3217-2c20-47f8-8aa5-bb5d9ce19d9e"}
+  ],
+  [
+    {name: "なるほど", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B73.wav?alt=media&token=b0646041-2b10-4e53-8af6-622592258719"},
+    {name: "いいね", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B73.wav?alt=media&token=a621a696-391a-42dc-89d5-7916d24ed673"},
+    {name: "神", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E7%A5%9E%E7%94%B73.wav?alt=media&token=f79d7548-233c-41c8-a3c4-41293ea59421"},
+    {name: "たしかに", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%9F%E3%81%97%E3%81%8B%E3%81%AB%E7%94%B73.wav?alt=media&token=12522aea-6c5e-429e-b3f0-ea2c3d3c6ba9"},
+    {name: "すごい", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%99%E3%81%94%E3%81%84%E7%94%B73.wav?alt=media&token=32f00606-6086-4a12-82af-5ede50028733"},
+    {name: "まじで", voice: "man3", url: "https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%BE%E3%81%98%E3%81%A7%E7%94%B73.wav?alt=media&token=85dce6ea-385a-4cd3-98ea-273bdf0345e6"}
+  ]
+];
+
+const sourceNoList = [];
+for(let i=0;i<6;i++){
+  soundEffectList[i].map((data)=>{
+    for(let j=0;j<audioTagSize;j++){
+      //console.log(audioTagSize + ' tagsize');
+      //console.log(data.name+data.voice+'-'+i);
+      sourceNoList.push(
+        <audio key={data.name+data.voice+'-'+j} id={data.name+data.voice+'-'+j} preload="auto">
+          <source src={data.url}></source>
+        </audio>
+      );
+      
+    }
+  })
+}
+
+const voiceREF = ['lady1','lady2','lady3','man1','man2','man3'];
+
 
 
 if(firstVisit){
   if(window.location.pathname === "/"){
-    window.location.href = window.location.href + "default";
+    window.location.href = window.location.href + "test1";
     firstVisit = false;
   }else{
     const col = firebase.firestore().collection(room_col).doc(room_name).collection(sound_list);
@@ -59,36 +145,25 @@ if(firstVisit){
         console.log(error);
       });
     }
+    for(let i=0;i<voiceREF.length;i++){
+      for(let j=0;j<soundEffectList[0].length;j++){
+        let voiceMan = soundEffectList[0][j].name + voiceREF[i];
+        col.doc(voiceMan).get().then((doc)=>{
+          if(!doc.exists){
+            col.doc(voiceMan).set({
+              sound: voiceMan,
+              randomNum: 2.2
+            });
+          }
+        });
+      }
+    }
     firstVisit = false;
   }
 }
 
-const soundEffectList = [
-  [
-    {name: "なるほど", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B31.wav?alt=media&token=06eca388-8c58-4c3b-b015-2155ed189783"},
-    {name: "いいね", voice: "lady1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B31.wav?alt=media&token=f4b80399-af83-44b8-9ddb-192c73dd4c0e"}
-  ],
-  [
-    {name: "なるほど", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B32.wav?alt=media&token=cea25561-e246-4f22-b2f8-5b0544adaefe"},
-    {name: "いいね", voice: "lady2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B32.wav?alt=media&token=67412df4-c8fd-4f2a-97b7-0fee7266a531"}
-  ],
-  [
-    {name: "なるほど", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E5%A5%B33.wav?alt=media&token=93aa1f29-6985-4ba1-8c44-11ed8e8afd81"},
-    {name: "いいね", voice: "lady3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E5%A5%B33.wav?alt=media&token=f72cdf0c-4be8-49f2-b111-743c4aa83152"}
-  ],
-  [
-    {name: "なるほど", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B71.wav?alt=media&token=76d319ad-ff65-4d7c-8cc7-4c327a5b2e7f"},
-    {name: "いいね", voice: "man1", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B71.wav?alt=media&token=de21b022-69da-4ed6-b331-8418a0b2f53d"}
-  ],
-  [
-    {name: "なるほど", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B72.wav?alt=media&token=d465a48b-c920-4415-9b30-67a3f4e01ebd"},
-    {name: "いいね", voice: "man2", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B72.wav?alt=media&token=0f5c26d8-4b98-42dc-8657-bd98b582f381"}
-  ],
-  [
-    {name: "なるほど", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%AA%E3%82%8B%E3%81%BB%E3%81%A9%E7%94%B73.wav?alt=media&token=b0646041-2b10-4e53-8af6-622592258719"},
-    {name: "いいね", voice: "man3", url:"https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/%E3%81%84%E3%81%84%E3%81%AD%E7%94%B73.wav?alt=media&token=a621a696-391a-42dc-89d5-7916d24ed673"}
-  ]
-];
+
+
 
 const reverseRef = {
   "lady1": 0,
@@ -97,6 +172,15 @@ const reverseRef = {
   "man1": 3,
   "man2": 4,
   "man3": 5
+};
+
+const revmanRef = {
+  "なるほど": 0,
+  "いいね": 1,
+  "神": 2,
+  "たしかに": 3,
+  "すごい": 4,
+  "まじで": 5
 };
 
 
@@ -137,12 +221,65 @@ for(let i=0;i<totalSound;i++){
   }
 }
 
+//-----------------------------------------------------------
+/* ピッチインピッチアウトによる拡大縮小を禁止 */
+  // document.documentElement.addEventListener('touchstart', function (e) {
+  //   if (e.touches.length >= 2) {e.preventDefault();}
+  // }, {passive: false});
+  /* ダブルタップによる拡大を禁止 */
+  var t = 0;
+  document.documentElement.addEventListener('touchend', function (e) {
+  var now = new Date().getTime();
+  if ((now - t) < 50){
+    e.preventDefault();
+  }
+  t = now;
+  }, false);
 
+//-----------------------------------------------------------
+
+var no;				// 数値格納用
+var number;	// 数値表示部分のDOM取得用
+var Flicksound = ['なるほど', '神', 'いいね', 'たしかに'];
+var koeshitulist = ['lady1', 'lady2', 'lady3', 'man1', 'man2', 'man3'];
+var koeshitu = 'man1';
+var notSendvar = 0;
+
+/*
+ * 次の番号を表示
+ */
+function next(){
+	no ++;
+	setNumber();
+}
+
+/*
+ * 前の番号を表示
+ */
+function previous(){
+	no --;
+	setNumber();
+}
+
+/*
+ * 数値を画面に表示する
+ */
+function setNumber(){
+	number.innerHTML = no;
+}
+
+/*
+ * 起動時の処理
+ */
+
+//-----------------------------------------------------------
 
 function App() {
-  const [soundVolume, setsoundVolume] = useState(0.05);
+  const [soundVolume, setsoundVolume] = useState(0.0);
   const [notSend, setnotSend] = useState(0);
-  const [manVoice, setmanVoice] = useState("lady1");
+  const [manVoice, setmanVoice] = useState("man1");
+  const [soundEffect, setsoundEffect] = useState("なるほど");
+  //const [soundFlick, setsoundFlick] = useState(['なるほどlady1', 'なるほどman1', 'いいねlady1', 'いいねman1']);
   console.log('inited');
 
   useEffect(()=>{
@@ -151,30 +288,17 @@ function App() {
     const db = firebase.firestore();
       const unsubscribe = db.collection(room_col).doc(room_name).collection(sound_list).onSnapshot(function(querySnapshot) {
         querySnapshot.docChanges().forEach(function(change) {
-            // if (change.type === "added") console.log("New city: ", change.doc.data());
-            // if (change.type === "modified") console.log("Modified city: ", change.doc.data());
-            // if (change.type === "removed") console.log("Removed city: ", change.doc.data());
             console.log(change.type);
             if (change.type === "added" || change.type === "removed"){
               return;
             }
-            // if(firstAudio > 0){
-            //   //console.log(firstAudio);
-            //   firstAudio--;
-            //   return;
-            // }
             const voiceMan = change.doc.data().sound;
-            //Audioplay(voiceMan, i);
             if(Number.isInteger(voiceMan)) Audioplay('sound-'+voiceMan+'-'+audioComponentList[voiceMan], voiceMan);
-            else Audioplay(voiceMan+'-'+0, 0);
-            //audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
-            // for(let i=0;i<totalSound;i++){
-            //   if(change.doc.data().sound === i){
-            //     Audioplay('sound-'+i+'-'+audioComponentList[i], i);
-            //     audioComponentList[i] = (audioComponentList[i] + 1) % audioComponentSize;
-            //     //console.log('if case success', i);
-            //   }
-            // }
+            else {
+              console.log(voiceMan+'-'+audioTag+' is ring');
+              Audioplay(voiceMan+'-'+audioTag, 0);
+              audioTag = ( audioTag + 1 ) % audioTagSize;
+            }
         });
     });
     return () => {
@@ -182,29 +306,96 @@ function App() {
     };
   },[]);
 
+  if(firstFlag){
+    firstFlag = false;
+    window.addEventListener("load", function(){
+      // 数値表示部分のDOM取得
+      number = document.getElementById("number");
+      
+      // 数値を画面に表示
+      no = 0;
+      setNumber();
+    
+      // スワイプイベント設定
+      setSwipe("#contents");
+    });
+  }
+
+  function setSwipe(elem) {
+    let t = document.querySelector(elem);
+    let startX;		// タッチ開始 x座標
+    let startY;		// タッチ開始 y座標
+    let moveX;	// スワイプ中の x座標
+    let moveY;	// スワイプ中の y座標
+    let dist = 50;	// スワイプを感知する最低距離（ピクセル単位）
+    
+    // タッチ開始時： xy座標を取得
+    t.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      startX = e.touches[0].pageX;
+          startY = e.touches[0].pageY;
+          moveX = startX;
+          moveY = startY;
+    });
+    
+    // スワイプ中： xy座標を取得
+    t.addEventListener("touchmove", function(e) {
+          e.preventDefault();
+      moveX = e.changedTouches[0].pageX;
+      moveY = e.changedTouches[0].pageY;
+    });
+    
+    // タッチ終了時： スワイプした距離から左右どちらにスワイプしたかを判定する/距離が短い場合何もしない
+    t.addEventListener("touchend", function(e) {
+          const vx = moveX - startX;
+          const vy = moveY - startY;
+          const sheta = Math.atan2(vy, vx) * 180 / Math.PI;
+          if((vx*vx+vy*vy<dist*dist)) return;
+  
+          console.log(vx, vy, sheta);
+          if(-45 <= sheta && sheta <= 45){ //right
+              console.log('right');
+              next();
+              next();
+              handleFlickPlay(1);
+          }else if(45 <= sheta && sheta <= 135){ //down
+              console.log('down');
+              next();
+              handleFlickPlay(2);
+          }else if(-135 <= sheta && sheta <= -45){ //up
+              console.log('up');
+              previous();
+              handleFlickPlay(3);
+          }else{ //left
+              console.log('left');
+              previous();
+              previous();
+              handleFlickPlay(0);
+          }
+    });
+  }
+
   const KeyPress = (e) => {
     const keyNum = e.which;
     console.log('pressed key is',keyNum);
     for(let i=0;i<totalSound;i++){
       if(keyList[i] === keyNum){
-        //Audioplay(`sound-${i+1}`);
-        //handleClickShareButton({soundid: i});
         handleClickPush(i);
       }
     }
   }
 
-  const Audioplay = (idName, sound) => { 
+  const Audioplay = async(idName, sound) => { 
     if( typeof( document.getElementById( idName ).currentTime ) !== 'undefined' ){
  	    document.getElementById( idName ).currentTime = 0;
     }
     console.log('soundVolume is ',soundVolumeManager);
     console.log('sound idName is', idName);
-    //const tmp = soundVolumeManager + soundAssist[sound];
-    //document.getElementById(idName).volume = tmp;
-    document.getElementById(idName).volume = soundVolumeManager;
-    //console.log(tmp);
-    document.getElementById(idName).play();
+    console.log('former VOLUME is '+document.getElementById(idName).volume);
+    document.getElementById(idName).volume = await soundVolumeManager;
+    console.log('VOLUME is '+document.getElementById(idName).volume);
+    await document.getElementById(idName).play();
+    
   }
 
   const handleClickPush = async (sound) =>{
@@ -232,7 +423,6 @@ function App() {
     const randomNum= Math.random();
     const newData = {sound: sound, randomNum: randomNum+updcnt};
     try{
-      //console.log(newData);
       await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).update(newData);
     }catch(error){
       await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).set(newData);
@@ -249,7 +439,6 @@ function App() {
       displayName = user.displayName;
     }
     //なければデータベースに追加
-    //const push_log = db.collection("rooms").doc(room).collection("people").doc("person1").collection("push_log");
     const push_log = db.collection(room_col).doc(room_name).collection(push_log_);
     const time = new Date().toLocaleString();
     
@@ -275,65 +464,86 @@ function App() {
     });
     (new CSV(array)).save('push_log.csv');
     return;
-    let blob = new Blob(array,{type:"text/plan"});
-    let link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'push_log.txt';
-    link.click();
-  }
-
-  const Geturl = () => {
-    const url = window.location.pathname;
-    console.log(window.location.host);
-    console.log(window.location.href);
-    console.log(window.location.origin);
-  }
-
-  const createRoom = () => {
-    const url = window.location.href + "default";
-    //room_name = "default";
-    //window.location.href = url;
-    window.open(url, '_brank');
-  }
-
-  const createRoomName = () => {
-    let roomName = document.getElementById("roomName").value;
-    console.log("roomName is:" + roomName);
-    const re = / +/;
-    console.log(re.test(roomName));
-    roomName = roomName.replace(/\s+/g, "");
-    console.log("replace roomName is:" + roomName);
-    if(re.test(roomName) || roomName === "") return;
-    const url = window.location.href + roomName;
-    console.log(roomName);
-    console.log(url);
-    window.open(url, '_brank');
-  }
-
-  const movement = ()=>{
-    let roomName = document.getElementById("move-form").value;
-    console.log("roomName is:" + roomName);
-    const re = / +/;
-    console.log(re.test(roomName));
-    roomName = roomName.replace(/\s+/g, "");
-    console.log("replace roomName is:" + roomName);
-    if(re.test(roomName) || roomName === "") return;
-    const url = window.location.origin + "/"+ roomName;
-    console.log(roomName);
-    console.log(url);
-    window.open(url, '_brank');
   }
 
   const voiceChange = ()=>{
-    //
     const voicelist = document.selectlist.voiceselect;
     const num = voicelist.selectedIndex;
     const voiceData = voicelist.options[num].value;
     console.log(voiceData);
     setmanVoice(voiceData);
+    koeshitu = voiceData;
   };
 
+  const koeChange = ()=>{
+    const koe = document.koelist.koeselect;
+    const num = koe.selectedIndex;
+    const koeData = koe.options[num].value;
+    console.log(koeData);
+    setsoundEffect(koeData);
+  }
+
+  const handleFlickPlay = async (dir)=>{
+    //
+    const db = firebase.firestore();
+    console.log('pass the handleFlickPlay');
+    const voiceMan = Flicksound[dir] + koeshitu;
+    console.log('man is ' + voiceMan);
+    console.log('not Send is ' + notSend);
+    if(notSendvar == 1){
+      const voice_id = revmanRef[koeshitu];
+      Audioplay(voiceMan + '-' + audioTagList[voice_id], voice_id);
+      console.log('not send version ' + voiceMan + '-' + audioTagList[voice_id]);
+      audioTagList[voice_id] = (audioTagList[voice_id] + 1) % audioTagSize;
+      const push_log = db.collection(room_col).doc(room_name).collection("push_log");
+      const date = TransTime();
+      const user = firebase.auth().currentUser;
+      let uid = "guest";
+      let displayName = "guest";
+      if(user != null){
+        uid = user.uid;
+        displayName = user.displayName;
+      }
+      const data = {mili: date.mili, time: date.time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
+      push_log.doc().set(data);
+      console.log(data);
+      return;
+    }
+
+    const docId = voiceMan;
+    const randomNum= Math.random();
+    const newData = {sound: voiceMan, randomNum: randomNum+updcnt};
+    try{
+      //console.log(newData);
+      await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).update(newData);
+    }catch(error){
+      await db.collection(room_col).doc(room_name).collection(sound_list).doc(docId).set(newData);
+      console.error(error);
+    }
+    updcnt = (updcnt + 1.0);
+
+    //データベースに押したことを保存
+    const user = firebase.auth().currentUser;
+    let uid = "guest";
+    let displayName = "guest";
+    if(user != null){
+      uid = user.uid;
+      displayName = user.displayName;
+    }
+    //なければデータベースに追加
+    //const push_log = db.collection("rooms").doc(room).collection("people").doc("person1").collection("push_log");
+    const push_log = db.collection(room_col).doc(room_name).collection(push_log_);
+    const date = TransTime();
+    const data = {mili: date.mili, time: date.time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
+    push_log.doc().set(data);
+    console.log(data);
+  }
+
   const handleClickPlay = async (sound)=>{
+    if(firstSleep){
+      noSleep.enable();
+      firstSleep = false;
+    }
     const db = firebase.firestore();
     const voiceManId = reverseRef[manVoice];
     const voiceMan = soundEffectList[voiceManId][sound].name + manVoice;
@@ -342,8 +552,7 @@ function App() {
       Audioplay(voiceMan + '-' + audioComponentList[sound], sound);
       //audioComponentList[sound] = (audioComponentList[sound] + 1) % audioComponentSize;
       const push_log = db.collection(room_col).doc(room_name).collection("push_log");
-      const date = new Date();
-      const time = date.toLocaleString();
+      const date = TransTime();
       const user = firebase.auth().currentUser;
       let uid = "guest";
       let displayName = "guest";
@@ -351,7 +560,7 @@ function App() {
         uid = user.uid;
         displayName = user.displayName;
       }
-      const data = {rowtime: date, time: time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
+      const data = {mili: date.mili, time: date.time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
       push_log.doc().set(data);
       console.log(data);
       return;
@@ -379,44 +588,75 @@ function App() {
     //なければデータベースに追加
     //const push_log = db.collection("rooms").doc(room).collection("people").doc("person1").collection("push_log");
     const push_log = db.collection(room_col).doc(room_name).collection(push_log_);
-    const date = new Date();
-    const time = date.toLocaleString();
-    
-    const data = {rowtime: date, time: time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
+    const date = TransTime();
+     
+    const data = {mili: date.mili, time: date.time, sound: voiceMan, name: displayName, uid: uid, notSend: notSend};
     push_log.doc().set(data);
     console.log(data);
   }
-  
 
   let appfunction;
   if(window.location.pathname !== "/"){
 
     appfunction = (
     <div tabIndex='0' className="App" onKeyPress={(e)=>{} }>
-      <Auth/>
 
-      <p>volume
+      <div className="whole" id="contents">
+        <p>たしかに</p>
+        <p className="flick-left">なるほど</p>
+        <p id="number">{no}</p>
+        <p className="flick-right">神</p>
+        
+        <p>いいね</p>
+      </div>
+      
+
+      <p className="pcl">
+        <p>[step1/3]必要に応じて音量を調節</p>
+        volume
         <RangeSlider className='volume-slider' max={0.3} min={0} step={0.005} value={soundVolume} onChange={(e)  => {setsoundVolume(Number(e.target.value)); soundVolumeManager = Number(e.target.value);}}/>
       </p>
-      <h4>roomName: {room_name}</h4>
+      {/* <h4>roomName: {room_name}</h4> */}
+
+      <button className='sendbutton sel' onClick={()=>{notSendvar = 1 - notSendvar;setnotSend(1-notSend);}}><span className="high-light">{notSendState[notSend]}</span> ← (ON:音が共有される  OFF:音は共有されない)</button>
+
       
-      
-      <button className='sendbutton' onClick={()=>{setnotSend(1-notSend);}}><span className="high-light">{notSendState[notSend]}</span> ← (ON:音が共有される  OFF:音は共有されない)</button>
-      
-      <br></br>
-      <form name="selectlist">
-        <select name="voiceselect" onChange={()=>{voiceChange()}}>
-          <option value="lady1">女1</option>
-          <option value="lady2">女2</option>
-          <option value="lady3">女3</option>
-          <option value="man1">男1</option>
-          <option value="man2">男2</option>
-          <option value="man3">男3</option>
+      <br className="sel"></br>
+      <form name="koelist" className="sel">
+        <span>ボタンの声 </span>
+        <select name="koeselect" onChange={()=>{koeChange()}}>
+          <option value="なるほど">なるほど</option>
+          <option value="いいね">いいね</option>
+          <option value="神">神</option>
+          <option value="たしかに">たしかに</option>
+          <option value="すごい">すごい</option>
+          <option value="まじで">まじで</option>
         </select>
       </form>
+      <br className="sel"></br>
+      
+      <button className='mainbutton' onClick={()=>{handleClickPlay(revmanRef[soundEffect])}}>{soundEffect}</button>
       <br></br>
-      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
+      <br></br>
+      <form name="selectlist" className="sel">
+        <span>声主 </span>
+        <select name="voiceselect" onChange={()=>{voiceChange()}}>
+          <option value="man1">男:高い</option>
+          <option value="man2">男:中</option>
+          <option value="man3">男:低い</option>
+          <option value="lady1">女:いきいき</option>
+          <option value="lady2">女:しっかり</option>
+          <option value="lady3">女:落ち着いた</option>
+        </select>
+      </form>
+      
+
+      {/* <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
       <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(1)}}>いいね</button>
+      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(2)}}>神</button>
+      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
+      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(4)}}>すごい</button>
+      <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(5)}}>まじで</button>
       <br></br>
       <button className='playbutton sound0' onClick={() => {handleClickPush(0)}}>{audioNameList[0]}</button>
       
@@ -432,117 +672,58 @@ function App() {
       <br></br>
 
       {SourceList.map((itemObj) => {
-        //console.log(itemObj.name);
         return(
           <audio key={itemObj.name} id={itemObj.name} preload="auto">
             <source src={audioSourceList[itemObj.sound]} type="audio/mp3"></source>
           </audio>
         );
       })}
+    */}
 
-      {/* {soundEffectLady.map((array) =>{
-        //console.log(array);
-        array.map((data) => {
-          console.log(data.name+data.voice);
-          return(
-            <audio key={data.name+data.voice} id={data.name+data.voice} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        });
-      })} */}
-      
-      {soundEffectList[0].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[1].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[2].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[3].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[4].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
-      })}
-      {soundEffectList[5].map((data)=>{
-        for(let i=0;i<audioComponentSize;i++){
-          return(
-            <audio key={data.name+data.voice+'-'+i} id={data.name+data.voice+'-'+i} preload="auto">
-              <source src={data.url}></source>
-            </audio>
-          );
-        }
+      {sourceNoList.map((data)=>{
+        //console.log(data);
+        return data;
       })}
       
-      {/* <audio key={soundEffectLady1[0].name+soundEffectLady1[0].voice} id={soundEffectLady1[0].name+soundEffectLady1[0].voice} preload="auto">
-        <source src={soundEffectLady1[0].url}></source>
-      </audio>
-      <audio key={soundEffectLady2[0].name+soundEffectLady2[0].voice} id={soundEffectLady2[0].name+soundEffectLady2[0].voice} preload="auto">
-        <source src={soundEffectLady2[0].url}></source>
-      </audio>
-      <audio key={soundEffectLady3[0].name+soundEffectLady3[0].voice} id={soundEffectLady3[0].name+soundEffectLady3[0].voice} preload="auto">
-        <source src={soundEffectLady3[0].url}></source>
-      </audio> */}
-      <p>↓スマホで読み取るとこの画面のリンクが表示</p>
-      <Qrcode/>
-      {/* <input id="move-form"></input>
-      <button onClick={()=>{movement()}}>部屋移動</button> */}
-      {/* <button onClick={()=>{Geturl()}}>ooo</button> */}
-      {/* <button onClick={()=>{handleClickLogButton()}}>oooo</button> */}
+      <div className="qrcode">
+        <p>[step2/3]↑のボタンを1回押す</p><p>[step3/3]↓スマホで読み取ってリンクを開く</p>
+        <Qrcode/>
+      </div>
+      <div className="sel">
+        <Auth/>
+      </div>
+      
     </div>
     )
     
   }else{
     appfunction = (
       <div className="App">
-        <h3></h3>
-        <button className="enter-btn random-btn" onClick={()=>{createRoom()}}>作成する</button>
-        <br></br>
-        ↑こっちをクリックしてください
-        <br></br>
-        {/* <button className="enter-btn create-btn" onClick={()=>{createRoomName()}}>名前をつけて作成する</button>
-        <br></br>
-        <span>名前 </span>
-        <input id="roomName"></input> */}
+        
       </div>
     );
   }
 
+  // for(let i=0;i<soundEffectList[0].length;i++){
+  //   for(let j=0;j<voiceREF.length;j++){
+  //   let name = soundEffectList[0][i].name;
+  //   let voice = voiceREF[j];
+  //   //console.log(name+voice+'-0');
+  //   let idName = name+voice+'-0';
+  //   //document.getElementById(idName).volume = soundVolumeManager;
+  //   }
+  // }
+
   return (
-    <div>{appfunction}</div>
+    <div>
+      <div>{appfunction}</div>
+      {/* <div>
+        <button onClick={()=>{handleClickLogButton()}}>Log</button>
+      </div> */}
+      
+      {/* <SelfNoSleep/> */}
+      
+    </div>
   );
 }
 

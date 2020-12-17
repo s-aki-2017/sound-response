@@ -1,0 +1,8 @@
+[
+    {
+      "origin": ["https://test1-81afe.firebaseapp.com","http://localhost:3000/test1","https://s-aki-2017.github.io/soundtest/"],
+      "method": ["GET"],
+      "responseHeader": ["*"],
+      "maxAgeSeconds": 86400
+    }
+]
