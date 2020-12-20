@@ -17,6 +17,11 @@
   pointer-events: none;
 }
 
+body , input , textarea , select {
+  /* 入力欄にフォーカスが当たっても拡大しない */
+  font-size:17px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -61,6 +66,7 @@
 }
 
 .mainbutton{
+  display: none;
   width: 298px;
   height: 179px;
   /*padding: 10px 30px;*/
@@ -76,10 +82,63 @@
   background-color: rgba(0,255,255,0.6);
 }
 
+.four-btn{
+  width: 126px;
+  height: 100px;
+  /*padding: 10px 30px;*/
+  font-size: 20px;
+  margin: 5px 5px 5px 5px;
+  /* background-color: #61dafb; */
+  background-color: rgba(81, 241, 66, 0.6);
+  box-shadow: 0 4px plum;
+  border-radius: 4px;
+}
+.four-btn:hover{
+  background-color: rgba(81, 241, 66, 1);
+  cursor: pointer;
+}
 
+.four-btn:active{
+  background-color: rgba(81, 241, 66, 1);
+  box-shadow: none;
+  position: relative;
+  top: 4px;
+}
 
+.selection{
+  display: inline;
+}
+
+.inl{
+  display: inline;
+}
 
 @media(min-width: 571px){
+  .four-btn{
+    width: 126px;
+    height: 126px;
+    /*padding: 10px 30px;*/
+    font-size: 20px;
+    margin: 5px 5px 5px 5px;
+    /* background-color: #61dafb; */
+    background-color: rgba(156, 146, 247, 0.6);
+    box-shadow: 0 4px plum;
+    border-radius: 126px;
+    outline: none;
+    
+  }
+  .four-btn:hover{
+    background-color: rgba(156, 146, 247, 1);
+    cursor: pointer;
+  }
+  
+  .four-btn:active{
+    background-color: rgba(156, 146, 247, 1);
+    box-shadow: none;
+    position: relative;
+    top: 4px;
+  }
+
   .mainbutton:hover{
     background-color: rgba(241, 111, 24, 0.8);
     cursor: pointer;
@@ -95,12 +154,39 @@
   .sel{
     display: none;
   }
+
+
 }
+
 
 @media(max-width: 570px){
   .pcl{
     display: none;
   }
+
+  .four-btn{
+    width: 47%;
+    height: 220px;
+    /*padding: 10px 30px;*/
+    font-size: 24px;
+    margin: 2px 2px 2px 2px;
+    /* background-color: #61dafb; */
+    background-color: rgba(81, 241, 66, 0.6);
+    box-shadow: 0 4px plum;
+    border-radius: 54px;
+  }
+  .four-btn:hover{
+    background-color: rgba(81, 241, 66, 1);
+    cursor: pointer;
+  }
+  
+  .four-btn:active{
+    background-color: rgba(81, 241, 66, 1);
+    box-shadow: none;
+    position: relative;
+    top: 4px;
+  }
+
   .playbutton{
     display: none;
     width: 126px;
@@ -149,6 +235,10 @@
   }
 }
 
+.redline{
+  color: blue;
+}
+
 
 .playbutton:hover{
   background-color: rgba(81, 241, 66, 1);
@@ -171,7 +261,23 @@
 
 .sendbutton{
   padding: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 0px;
+  
+  background-color: rgb(228, 223, 155);
+  border-radius: 24px;
+  outline: none;
+  box-shadow: 0 4px plum;
+}
+.sendbutton:hover{
+  background-color: rgba(228, 223, 155, 0.6);
+  cursor: pointer;
+
+}
+.sendbutton:active{
+  background-color: rgba(228, 223, 155, 0.6);
+  box-shadow: none;
+  position: relative;
+  top: 4px;
 }
 
 .high-light{
@@ -181,7 +287,6 @@
 
 .log-btn{
   background-color: #85692d;
-  
 }
 
 .bottom-margin{
@@ -214,4 +319,12 @@
 
 .create-btn{
   background-color: black;
+}
+
+.redchar{
+  color: red;
+}
+
+.smallchar{
+  font-size: 12px;
 }

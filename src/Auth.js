@@ -72,7 +72,7 @@ class Auth extends Component {
         {this.state.user ? (
           <div className="UserName-log">
             <img className="photo-url" src={this.state.user.photoURL}></img>
-            <h3 className="UserName"><span className="UserNameTitle">Username:</span>  {this.state.user && this.state.user.displayName}  </h3>
+            <h3 className="UserName"><span className="UserNameTitle">User:</span>  {this.state.user && this.state.user.displayName}  </h3>
           </div>
           // displayNameでログインした人のGoogleアカウントに登録されている名前を表示する
         ) : (
@@ -80,10 +80,10 @@ class Auth extends Component {
 　　　　　　//ログインしていない人用の表示
         )}
         {this.state.user ? (
-          <button className="logout-btn login-logout" onClick={this.logout}>Google Logout</button>
+          <button className="logout-btn login-logout" onClick={this.logout}>Logout</button>
 　　　　　　//ユーザーがログインしている時はlogoutボタンを表示する
         ) : (
-          <button className="login-btn login-logout" onClick={this.login}>Google Login</button>
+          <button className="login-btn login-logout" onClick={this.login}>Login</button>
 　　　　　　//ユーザーがいない時はloginボタンを表示する
         )}
       </div>

@@ -1,7 +1,6 @@
 /* style.css */
 @charset "utf-8";
-
-.whole{
+.not-vis{
 	display: none;
 }
 
@@ -11,31 +10,53 @@ body{
 	font-family: 'メイリオ', Helvetica;
 	
 	width: 100%;
+	
     margin: 0 auto;
 }
 #contents{
 	/* background-image: url("https://firebasestorage.googleapis.com/v0/b/test1-81afe.appspot.com/o/button_back.png?alt=media&token=042482e1-8c77-45e1-ab46-bea5fb3f5b24") ; */
+	
 	background-position: center center;
 	background-color: aqua;
+	/* height: 400px; */
 	background-size: cover;
 	text-align: center;
-}
-#number{
-	padding: 1em 0;
-	font-family: Impact, Helvetica;
-	font-weight: 900;
-	font-size: 32pt;
+	/* position: relative; */
+	
 	
 }
+#number{
+	/* padding: 1em 0; */
+	
+	font-family: Impact, Helvetica;
+	font-weight: 900;
+	font-size: 218pt;
+	color: aqua;
+	display: inline;
+	
+}
+
 p{
-	font-size: 12pt;
+	font-size: 18pt;
 }
 .flick-left{
+	display: inline;
 	text-align: left;
+	float: left;
+	line-height: 280px;
 }
 .flick-right{
+	display: inline;
 	text-align: right;
+	float: right;
+	line-height: 280px;
 }
+/* .bottom{
+	position: absolute;
+	bottom: 0;
+	text-align: center;
+	right: 40%;
+} */
 footer{
 	font-size: 0.8em;
 	padding: 1em;

@@ -12,9 +12,11 @@ import nosleep from 'nosleep.js';
 
 var updcnt = 0;
 var totalSound = 6;
-var soundVolumeManager = 0.3;
+var soundVolumeManager = 0.05;
 const soundAssist = [0,0,0,0,0,0];
-var notSendState = ['ON', 'OFF'];
+var notSendState = ['共有モード', '操作確認モード'];
+var notSendStatePC = ['共有モード', '音声確認モード'];
+var notSendClass = ['bluebg', 'redbg'];
 var keyList = [113,119,97,115,122,120];
 var audioComponentSize = 3;
 var audioComponentList = [0,0,0,0,0,0];
@@ -26,7 +28,8 @@ let firstVisit = true;
 let firstFlag = true;
 var firstSleep = true;
 var noSleep = new nosleep();
-
+var nosleepinit = true;
+var notSendPC = 1;
 
 
 const TransTime = ()=>{
@@ -106,17 +109,18 @@ const soundEffectList = [
 ];
 
 const sourceNoList = [];
+const sourceIdList = [];
 for(let i=0;i<6;i++){
   soundEffectList[i].map((data)=>{
     for(let j=0;j<audioTagSize;j++){
       //console.log(audioTagSize + ' tagsize');
       //console.log(data.name+data.voice+'-'+i);
+      sourceIdList.push(data.name+data.voice+'-'+j);
       sourceNoList.push(
-        <audio key={data.name+data.voice+'-'+j} id={data.name+data.voice+'-'+j} preload="auto">
+        <audio className="oto" key={data.name+data.voice+'-'+j} id={data.name+data.voice+'-'+j} preload="auto">
           <source src={data.url}></source>
         </audio>
       );
-      
     }
   })
 }
@@ -240,10 +244,9 @@ for(let i=0;i<totalSound;i++){
 
 var no;				// 数値格納用
 var number;	// 数値表示部分のDOM取得用
-var Flicksound = ['なるほど', '神', 'いいね', 'たしかに'];
-var koeshitulist = ['lady1', 'lady2', 'lady3', 'man1', 'man2', 'man3'];
+var Flicksound = ['なるほど', 'すごい', 'いいね', 'たしかに'];
 var koeshitu = 'man1';
-var notSendvar = 0;
+var notSendvar = 1;
 
 /*
  * 次の番号を表示
@@ -275,8 +278,8 @@ function setNumber(){
 //-----------------------------------------------------------
 
 function App() {
-  const [soundVolume, setsoundVolume] = useState(0.0);
-  const [notSend, setnotSend] = useState(0);
+  const [soundVolume, setsoundVolume] = useState(0.05);
+  const [notSend, setnotSend] = useState(1);
   const [manVoice, setmanVoice] = useState("man1");
   const [soundEffect, setsoundEffect] = useState("なるほど");
   //const [soundFlick, setsoundFlick] = useState(['なるほどlady1', 'なるほどman1', 'いいねlady1', 'いいねman1']);
@@ -292,7 +295,9 @@ function App() {
             if (change.type === "added" || change.type === "removed"){
               return;
             }
+            //if (notSend) return;
             const voiceMan = change.doc.data().sound;
+            
             if(Number.isInteger(voiceMan)) Audioplay('sound-'+voiceMan+'-'+audioComponentList[voiceMan], voiceMan);
             else {
               console.log(voiceMan+'-'+audioTag+' is ring');
@@ -305,6 +310,11 @@ function App() {
       unsubscribe();
     };
   },[]);
+
+  if(firstSleep){
+    noSleep.enable();
+    firstSleep = false;
+  }
 
   if(firstFlag){
     firstFlag = false;
@@ -355,24 +365,32 @@ function App() {
           console.log(vx, vy, sheta);
           if(-45 <= sheta && sheta <= 45){ //right
               console.log('right');
-              next();
-              next();
+              //next();
+              //next();
               handleFlickPlay(1);
           }else if(45 <= sheta && sheta <= 135){ //down
               console.log('down');
-              next();
+              //next();
               handleFlickPlay(2);
           }else if(-135 <= sheta && sheta <= -45){ //up
               console.log('up');
-              previous();
+              //previous();
               handleFlickPlay(3);
           }else{ //left
               console.log('left');
-              previous();
-              previous();
+              //previous();
+              //previous();
               handleFlickPlay(0);
           }
     });
+  }
+
+  const NosleepInit = ()=>{
+    if(nosleepinit){
+      noSleep.enable();
+      //nosleepinit = false;
+    }
+    return;
   }
 
   const KeyPress = (e) => {
@@ -482,9 +500,18 @@ function App() {
     console.log(koeData);
     setsoundEffect(koeData);
   }
+  
 
   const handleFlickPlay = async (dir)=>{
     //
+    if(firstSleep){
+      noSleep.enable();
+      firstSleep = false;
+      sourceIdList.map((idName)=>{
+        //console.log(idName);
+        document.getElementById(idName).volume = 0.0;
+      });
+    }
     const db = firebase.firestore();
     console.log('pass the handleFlickPlay');
     const voiceMan = Flicksound[dir] + koeshitu;
@@ -543,6 +570,10 @@ function App() {
     if(firstSleep){
       noSleep.enable();
       firstSleep = false;
+      sourceIdList.map((idName)=>{
+        //console.log(idName);
+        document.getElementById(idName).volume = 0.05;
+      });
     }
     const db = firebase.firestore();
     const voiceManId = reverseRef[manVoice];
@@ -596,33 +627,98 @@ function App() {
   }
 
   let appfunction;
+  let flickzone;
+  let btnzone;
+  let mainbtnzone;
   if(window.location.pathname !== "/"){
 
+    if(window.location.pathname[1] === "f"){
+      flickzone = (
+        <div className="fstart hole sel" id="contents">
+          <p>たしかに</p>
+          <p className="flick-left">なるほど</p>
+          <p id="number">{no}</p>
+          <p className="flick-right">すごい</p>
+          
+          <p className="bottom">いいね</p>
+        </div>
+      );
+      btnzone = (
+        <div className="pcl">
+          <button className='four-btn' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(1)}}>いいね</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(4)}}>すごい</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
+        </div>
+      );
+    }else{
+      flickzone = (
+        <div className="not-vis" id="contents">
+          <p>たしかに</p>
+          <p className="flick-left">なるほど</p>
+          <p id="number">{no}</p>
+          <p className="flick-right">すごい</p>
+          
+          <p>いいね</p>
+        </div>
+      );
+      btnzone = (
+        <div>
+          <button className='four-btn' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(1)}}>いいね</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(4)}}>すごい</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
+        </div>
+      );
+    }
+
     appfunction = (
-    <div tabIndex='0' className="App" onKeyPress={(e)=>{} }>
-
-      <div className="whole" id="contents">
-        <p>たしかに</p>
-        <p className="flick-left">なるほど</p>
-        <p id="number">{no}</p>
-        <p className="flick-right">神</p>
-        
-        <p>いいね</p>
+    <div tabIndex='0' className="App" onClick={()=>{NosleepInit();}} onKeyPress={(e)=>{} }>
+      <div>
+        <h1 className="pcl inl">音声<span className="redchar">出力</span>専用画面</h1>
+        <h4 className="sel"><span className="redchar">入力</span>用画面　　<span>room: {room_name}</span>
+        </h4>
+        <h4 className="pcl inl">　　room: {room_name}</h4>
       </div>
-      
 
-      <p className="pcl">
-        <p>[step1/3]必要に応じて音量を調節</p>
-        volume
-        <RangeSlider className='volume-slider' max={0.3} min={0} step={0.005} value={soundVolume} onChange={(e)  => {setsoundVolume(Number(e.target.value)); soundVolumeManager = Number(e.target.value);}}/>
+      <br className="pcl"></br>
+      <br className="pcl"></br>
+
+      <div>
+        
+        <button className='sendbutton sel' onClick={()=>{notSendvar = 1 - notSendvar;setnotSend(1-notSend);}}><span className="high-light">{notSendState[notSend]}</span></button>
+        <button className='sendbutton pcl'><span className="high-light">{notSendStatePC[notSendPC]}</span></button>
+        {/* <button className='sendbutton pcl' onClick={()=>{notSendvar = 1 - notSendvar;setnotSend(1-notSend);}}><span className="high-light">{notSendStatePC[notSend]}</span></button> */}
+        
+        <form name="selectlist" className="selection">
+          <span className="sel">　　入力声 </span>
+          <span className="pcl">　　声 </span>
+          <select name="voiceselect" onChange={()=>{voiceChange()}}>
+            <option value="man1">男:高い</option>
+            <option value="man2">男:中</option>
+            <option value="man3">男:低い</option>
+            <option value="lady1">女:いきいき</option>
+            <option value="lady2">女:しっかり</option>
+            <option value="lady3">女:落ち着いた</option>
+          </select>
+        </form>
+      </div>
+      <p className="pcl smallchar">※音声確認モードでは音が共有されません</p>
+      <p className="pcl smallchar">※実験用に操作確認モード以外は選べないようにしています</p>
+      {/* <p className="pcl smallchar">※この画面で設定した声は確認用です</p> */}
+      <p className="sel smallchar">※操作確認モードでは音が共有されません</p>
+      {/* <p className="redline">[step1/3]必要に応じて音量を調節</p> */}
+      <br className="pcl"></br>
+      <p className="pcl inl">
+          音量
+          <RangeSlider className='volume-slider' max={0.3} min={0} step={0.005} value={soundVolume} onChange={(e)  => {setsoundVolume(Number(e.target.value)); soundVolumeManager = Number(e.target.value);}}/>
+          {/* <input type="range"></input> */}
       </p>
-      {/* <h4>roomName: {room_name}</h4> */}
-
-      <button className='sendbutton sel' onClick={()=>{notSendvar = 1 - notSendvar;setnotSend(1-notSend);}}><span className="high-light">{notSendState[notSend]}</span> ← (ON:音が共有される  OFF:音は共有されない)</button>
-
+      {/* <br className="sel"></br> */}
+      {flickzone}
+      {btnzone}
       
-      <br className="sel"></br>
-      <form name="koelist" className="sel">
+      {/* <form name="koelist" className="sel pcl">
         <span>ボタンの声 </span>
         <select name="koeselect" onChange={()=>{koeChange()}}>
           <option value="なるほど">なるほど</option>
@@ -632,23 +728,12 @@ function App() {
           <option value="すごい">すごい</option>
           <option value="まじで">まじで</option>
         </select>
-      </form>
-      <br className="sel"></br>
+      </form> */}
       
-      <button className='mainbutton' onClick={()=>{handleClickPlay(revmanRef[soundEffect])}}>{soundEffect}</button>
+      {/* <button className='mainbutton' onClick={()=>{handleClickPlay(revmanRef[soundEffect])}}>{soundEffect}</button>
       <br></br>
-      <br></br>
-      <form name="selectlist" className="sel">
-        <span>声主 </span>
-        <select name="voiceselect" onChange={()=>{voiceChange()}}>
-          <option value="man1">男:高い</option>
-          <option value="man2">男:中</option>
-          <option value="man3">男:低い</option>
-          <option value="lady1">女:いきいき</option>
-          <option value="lady2">女:しっかり</option>
-          <option value="lady3">女:落ち着いた</option>
-        </select>
-      </form>
+      <br></br> */}
+      
       
 
       {/* <button className='playbutton colorbutton' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
@@ -680,13 +765,16 @@ function App() {
       })}
     */}
 
+      
+
       {sourceNoList.map((data)=>{
         //console.log(data);
         return data;
       })}
       
       <div className="qrcode">
-        <p>[step2/3]↑のボタンを1回押す</p><p>[step3/3]↓スマホで読み取ってリンクを開く</p>
+        <p className="redline">[step1/2]↑のボタンを押して音量と声を確認</p>
+        <p className="redline">[step2/2]↓スマホで読み取って入力用画面を開く</p>
         <Qrcode/>
       </div>
       <div className="sel">
@@ -721,10 +809,12 @@ function App() {
         <button onClick={()=>{handleClickLogButton()}}>Log</button>
       </div> */}
       
-      {/* <SelfNoSleep/> */}
+      {/* <div className="sel"><SelfNoSleep/></div> */}
       
     </div>
   );
 }
+
+
 
 export default App;
