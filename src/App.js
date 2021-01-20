@@ -131,7 +131,7 @@ const voiceREF = ['lady1','lady2','lady3','man1','man2','man3'];
 
 if(firstVisit){
   if(window.location.pathname === "/"){
-    window.location.href = window.location.href + "test1";
+    window.location.href = window.location.href + "fest1";
     firstVisit = false;
   }else{
     const col = firebase.firestore().collection(room_col).doc(room_name).collection(sound_list);
@@ -635,20 +635,22 @@ function App() {
     if(window.location.pathname[1] === "f"){
       flickzone = (
         <div className="fstart hole sel" id="contents">
-          <p>たしかに</p>
-          <p className="flick-left">なるほど</p>
-          <p id="number">{no}</p>
-          <p className="flick-right">すごい</p>
+          <p className="smaller">たしかに↑</p>
           
-          <p className="bottom">いいね</p>
+          <p className="flick-left smaller">なるほど←</p>
+          <p id="number">{no}</p>
+          <p className="flick-right smaller">→すごい</p>
+          
+          <p className="bottom smaller">いいね↓</p>
         </div>
       );
       btnzone = (
         <div className="pcl">
           <button className='four-btn' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
           <button className='four-btn' onClick={()=>{handleClickPlay(1)}}>いいね</button>
           <button className='four-btn' onClick={()=>{handleClickPlay(4)}}>すごい</button>
-          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
+          
         </div>
       );
     }else{
@@ -665,9 +667,10 @@ function App() {
       btnzone = (
         <div>
           <button className='four-btn' onClick={()=>{handleClickPlay(0)}}>なるほど</button>
+          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
           <button className='four-btn' onClick={()=>{handleClickPlay(1)}}>いいね</button>
           <button className='four-btn' onClick={()=>{handleClickPlay(4)}}>すごい</button>
-          <button className='four-btn' onClick={()=>{handleClickPlay(3)}}>たしかに</button>
+          
         </div>
       );
     }
@@ -675,8 +678,8 @@ function App() {
     appfunction = (
     <div tabIndex='0' className="App" onClick={()=>{NosleepInit();}} onKeyPress={(e)=>{} }>
       <div>
-        <h1 className="pcl inl">音声<span className="redchar">出力</span>専用画面</h1>
-        <h4 className="sel"><span className="redchar">入力</span>用画面　　<span>room: {room_name}</span>
+        <h1 className="pcl inl">音声<span className="redchar">受信</span>専用画面</h1>
+        <h4 className="sel"><span className="redchar">送信</span>用画面　　<span>room: {room_name}</span>
         </h4>
         <h4 className="pcl inl">　　room: {room_name}</h4>
       </div>
@@ -805,9 +808,9 @@ function App() {
   return (
     <div>
       <div>{appfunction}</div>
-      {/* <div>
+      <div>
         <button onClick={()=>{handleClickLogButton()}}>Log</button>
-      </div> */}
+      </div>
       
       {/* <div className="sel"><SelfNoSleep/></div> */}
       

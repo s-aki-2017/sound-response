@@ -63,6 +63,10 @@ footer{
 	text-align: center;
 }
 
+.smaller{
+	font-size: 16px;
+}
+
 @media screen and (min-width: 768px) and (max-width: 1024px) {
  
     /* タブレット用のcssを記述 */
